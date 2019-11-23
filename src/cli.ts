@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import program from 'commander';
-import { IconPlatform, IconType, IconGenerator, IconGeneratorOptions } from './iconkit';
+import { IconPlatform, IconType, IconGenerator, IconGeneratorOptions } from './appiconkit';
 import fs from 'fs';
 import jimp from 'jimp';
 const pkg = require('../package.json');

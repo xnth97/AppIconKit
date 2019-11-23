@@ -1,14 +1,14 @@
 {
-  "name": "iconkit",
+  "name": "appiconkit",
   "version": "1.0.0",
   "description": "An app icon/image assets generator for Apple platforms.",
-  "main": "lib/iconkit.js",
-  "types": "lib/iconkit.d.ts",
+  "main": "lib/appiconkit.js",
+  "types": "lib/appiconkit.d.ts",
   "bin": {
     "icon": "lib/cli.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf lib && tsc",
     "prepare": "npm run build"
   },
   "repository": {

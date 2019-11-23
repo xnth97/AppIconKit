@@ -1,6 +1,8 @@
-# IconKit
+# AppIconKit
 
 An app icon/image assets generator for Apple platforms.
+
+[![badge](https://img.shields.io/npm/v/appiconkit.svg?color=blue)](https://www.npmjs.com/package/appiconkit)
 
 ## Usage
 
