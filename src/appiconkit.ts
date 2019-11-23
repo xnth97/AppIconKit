@@ -92,7 +92,7 @@ class IconGenerator {
     if (!image) {
       return Promise.reject(new Error('Invalid input image.'));
     }
-    if (type === 'icon' && (image.bitmap.width < 1024 || image.bitmap.height < 1024)) {
+    if (type === 'icon' && (image.getWidth() < 1024 || image.getHeight() < 1024)) {
       return Promise.reject(new Error('Icon size must be greater than 1024x1024'));
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "appiconkit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An app icon/image assets generator for Apple platforms.",
   "main": "lib/appiconkit.js",
   "types": "lib/appiconkit.d.ts",
@@ -32,8 +32,6 @@
   ],
   "homepage": "https://github.com/xnth97/iconkit#readme",
   "dependencies": {
-    "@types/commander": "^2.12.2",
-    "@types/jimp": "^0.2.28",
     "@types/node": "^12.12.11",
     "commander": "^4.0.1",
     "jimp": "^0.8.5"
