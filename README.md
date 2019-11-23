@@ -34,29 +34,29 @@ icon <input> [options]
 
 Please note that width and height are for generated @1x image. If both weight and height are given, the image will be resized to exactly weight and height. If one of width and height is given, it will automatically choose the other dimension for the resized images. If none of them is given, the original image is used as @3x.
 
+`-h, --help`: Shows the help.
+
 ## Usage
 
-### Installation
-
-1. Install the package under your project.
+Install the package under your project.
 
 ```
 npm install --save appiconkit
 ```
 
-2. Import the dependency
+Import the dependency in your code.
 
 ```javascript
 const { IconGenerator } = require('appiconkit');
 ```
 
-3. Initialize an `IconGenerator` instance.
+Initialize an `IconGenerator` instance.
 
 ```javascript
 let g = new IconGenerator();
 ```
 
-4. Generate imageset or appiconset.
+Call proper functions to generate imageset or appiconset.
 
 ```javascript
 g.generateIconSet('/path/to/image', '/path/to/output');

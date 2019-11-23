@@ -17,6 +17,9 @@ interface IconGeneratorOptions {
  */
 class IconGenerator {
 
+  /**
+   * Constructs an IconGenerator object.
+   */
   constructor() {
 
   }
@@ -93,7 +96,7 @@ class IconGenerator {
       return Promise.reject(new Error('Invalid input image.'));
     }
     if (type === 'icon' && (image.getWidth() < 1024 || image.getHeight() < 1024)) {
-      return Promise.reject(new Error('Icon size must be greater than 1024x1024'));
+      return Promise.reject(new Error('Icon size must be greater than 1024x1024.'));
     }
 
     let output: string;
@@ -139,7 +142,7 @@ class IconGenerator {
       imageConfig['filename'] = newFileName;
     }
 
-    fs.writeFileSync(path.join(output, 'Contents.json'), JSON.stringify(contents, null, 4));
+    fs.writeFileSync(path.join(output, 'Contents.json'), JSON.stringify(contents, null, 2));
   }
 
 }
