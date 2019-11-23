@@ -47,7 +47,7 @@ npm install --save appiconkit
 2. Import the dependency
 
 ```javascript
-const { IconGenerator } = const { IconGenerator } = require('appiconkit');
+const { IconGenerator } = require('appiconkit');
 ```
 
 3. Initialize an `IconGenerator` instance.
