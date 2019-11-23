@@ -59,3 +59,13 @@ typings/
 
 # next.js build output
 .next
+
+# dev
+.vscode
+
+# build
+lib
+
+# junks
+.DS_Store
+*/.DS_Store

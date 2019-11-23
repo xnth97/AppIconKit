@@ -1,0 +1,44 @@
+{
+  "name": "iconkit",
+  "version": "1.0.0",
+  "description": "An app icon/image assets generator for Apple platforms.",
+  "main": "lib/iconkit.js",
+  "types": "lib/iconkit.d.ts",
+  "bin": {
+    "icon": "lib/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xnth97/iconkit.git"
+  },
+  "author": "Yubo Qin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xnth97/iconkit/issues"
+  },
+  "keywords": [
+    "ios",
+    "watchos",
+    "macos",
+    "asset",
+    "icon",
+    "image",
+    "iconset",
+    "imageset"
+  ],
+  "homepage": "https://github.com/xnth97/iconkit#readme",
+  "dependencies": {
+    "@types/commander": "^2.12.2",
+    "@types/jimp": "^0.2.28",
+    "@types/node": "^12.12.11",
+    "commander": "^4.0.1",
+    "jimp": "^0.8.5"
+  },
+  "devDependencies": {
+    "typescript": "^3.7.2"
+  }
+}
