@@ -2,14 +2,23 @@ import fs from 'fs';
 import path from 'path';
 import jimp from 'jimp';
 
-type IconPlatform = 'ios' | 'iphone' | 'ipad' | 'watchos' | 'watch' | 'macos' | 'mac';
+type IconPlatform = 'ios' | 'iphone' | 'ipad' | 'watchos' | 'watch' | 'macos' | 'mac' | 'web';
 type IconType = 'icon' | 'image';
+type ImageFormat = 'bmp' | 'gif' | 'jpeg' | 'png' | 'tiff' | 'default';
 
 interface IconGeneratorOptions {
   type: IconType;
   platform: IconPlatform;
   width?: number;
   height?: number;
+  format?: ImageFormat;
+}
+
+interface GenericResizeOption {
+  width: number;
+  height: number;
+  filename?: string;
+  format?: ImageFormat;
 }
 
 /**
@@ -34,6 +43,7 @@ class IconGenerator {
     return this.generateImages(inputPath, outputPath, {
       type: 'icon',
       platform: platform ?? 'ios',
+      format: 'png',
     });
   }
 
@@ -49,12 +59,13 @@ class IconGenerator {
    * @param width         @1x width of the output image
    * @param height        @1x height of the output image
    */
-  async generateImageSet(inputPath: string, outputPath: string, width?: number, height?: number): Promise<void> {
+  async generateImageSet(inputPath: string, outputPath: string, width?: number, height?: number, format?: ImageFormat): Promise<void> {
     return this.generateImages(inputPath, outputPath, {
       type: 'icon',
       platform: 'ios',
       width: width ?? jimp.AUTO,
       height: height ?? jimp.AUTO,
+      format: format ?? 'png',
     });
   }
 
@@ -68,12 +79,18 @@ class IconGenerator {
     let options = generatorOptions ?? {
       type: 'icon',
       platform: 'ios',
+      format: 'png',
     };
 
     const type = options.type;
     let platform = options.platform;
     let programWidth = options.width ?? jimp.AUTO;
     let programHeight = options.height ?? jimp.AUTO;
+    let programFormat = options.format ?? 'png';
+
+    if (options.platform === 'web') {
+      return this.generateWebIconImages(inputPath, outputPath);
+    }
 
     const platformMap = {
       'ios': 'ios',
@@ -83,6 +100,7 @@ class IconGenerator {
       'watch': 'watchos',
       'macos': 'macos',
       'mac': 'macos',
+      'web': 'web',
     };
     const pathDir = type === 'icon' ? platformMap[platform] : 'imageset';
     const config: { [key: string]: any } = require(`../config/${pathDir}/Contents.json`);
@@ -134,7 +152,10 @@ class IconGenerator {
       }
 
       const baseName = path.basename(inputPath).split('.')[0];
-      const extName = path.extname(inputPath);
+      let extName = path.extname(inputPath);
+      if (programFormat !== 'default') {
+        extName = `.${programFormat}`;
+      }
       const newFileName = `${baseName}${fileNameSuffix}${extName}`;
       const newPath = path.join(output, newFileName);
       await image.clone().resize(width, height).writeAsync(newPath);
@@ -145,6 +166,63 @@ class IconGenerator {
     fs.writeFileSync(path.join(output, 'Contents.json'), JSON.stringify(contents, null, 2));
   }
 
+  async generateWebIconImages(inputPath: string, outputPath: string) {
+    let options: Array<GenericResizeOption> = [
+      {
+        width: 16,
+        height: 16,
+        filename: 'favicon',
+        format: 'png',
+      }, {
+        width: 192,
+        height: 192,
+        format: 'png',
+      }, {
+        width: 512,
+        height: 512,
+        format: 'png',
+      }
+    ];
+    return this.generateGenericImages(inputPath, outputPath, options);
+  }
+
+  async generateGenericImages(inputPath: string, outputPath: string, options: Array<GenericResizeOption>) {
+    const image = await jimp.read(inputPath);
+    if (!image) {
+      return Promise.reject(new Error('Invalid input image.'));
+    }
+    
+    if (!fs.existsSync(outputPath)) {
+      try {
+        fs.mkdirSync(outputPath);
+      } catch(error) {
+        return Promise.reject(error);
+      }
+    }
+    
+    if (!fs.lstatSync(outputPath).isDirectory()) {
+      return Promise.reject(new Error(`Error: ${outputPath} exists and is not a directory.`));
+    }
+
+    const extName = path.extname(inputPath);
+    for (let option of options) {
+      let newFileName;
+      let newExtName;
+      if (option.format === 'default') {
+        newExtName = extName;
+      } else {
+        newExtName = `.${option.format}`;
+      }
+      if (option.filename !== undefined) {
+        newFileName = `${option.filename}${newExtName}`;
+      } else {
+        newFileName = `Icon-${option.width}${newExtName}`;
+      }
+      const newPath = path.join(outputPath, newFileName);
+      await image.clone().resize(option.width, option.height).writeAsync(newPath);
+    }
+  }
+
 }
 
 export {
@@ -152,4 +230,6 @@ export {
   IconType,
   IconGenerator,
   IconGeneratorOptions,
+  GenericResizeOption,
+  ImageFormat,
 }

@@ -1,6 +1,6 @@
 # AppIconKit
 
-An app icon/image assets generator for Apple platforms.
+An app icon/image assets generator for apps.
 
 [![badge](https://img.shields.io/npm/v/appiconkit.svg?color=blue)](https://www.npmjs.com/package/appiconkit)
 
@@ -26,7 +26,13 @@ icon <input> [options]
 
 `-t, --type <type>`: Type for generated assets. Can be `icon | image`.
 
-`-p, --platform <platform>`: Platform for icon set. Can be `ios | watchos | macos`.
+`-p, --platform <platform>`: Platform for icon set. Can be `ios | watchos | macos | web`.
+
+Please note that for `web` platform, only manifest icon images will be generated, following definitions [here](https://web.dev/add-manifest/).
+
+`-f, --format <format>`: Format for generated images. Can be `'bmp' | 'gif' | 'jpeg' | 'png' | 'tiff' | 'default'`. Default value is `png`.
+
+Please note that `default` value means that keeps the original format. For `icon` type, this option will be ignored and only PNG will be generated. On Apple platforms, only JPEG and PNG will be generated.
 
 `-W, --width <number>`: @1x width for generated image set.
 
@@ -70,6 +76,7 @@ g.generateImages('/path/to/image', '/path/to/output', {
   platform: 'ios',
   width: 160,
   height: 120,
+  format: 'png',
 });
 ```
 

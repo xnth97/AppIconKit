@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import program from 'commander';
-import { IconPlatform, IconType, IconGenerator, IconGeneratorOptions } from './appiconkit';
+import { IconPlatform, IconType, IconGenerator, IconGeneratorOptions, ImageFormat } from './appiconkit';
 import fs from 'fs';
 import jimp from 'jimp';
 const pkg = require('../package.json');
@@ -13,6 +13,7 @@ program
   .option('-o, --output <path>', 'output path for icon set', process.cwd())
   .option('-t, --type <type>', 'type for generated asset', 'icon')
   .option('-p, --platform <value>', 'platform for icon set', 'ios')
+  .option('-f, --format <format>', 'format for generated images', 'png')
   .option('-W, --width <number>', 'width for image set', jimp.AUTO)
   .option('-H, --height <number>', 'height for image set', jimp.AUTO);
   
@@ -26,9 +27,20 @@ function buildOptions(program: any): IconGeneratorOptions {
   }
 
   let programPlatform: IconPlatform = program.platform.toLowerCase();
-  const platformSet = new Set<IconPlatform>(['ios', 'iphone', 'ipad', 'watchos', 'watch', 'macos', 'mac']);
+  const platformSet = new Set<IconPlatform>(['ios', 'iphone', 'ipad', 'watchos', 'watch', 'macos', 'mac', 'web']);
   if (!platformSet.has(programPlatform)) {
     programPlatform = 'ios';
+  }
+
+  let programFormat: ImageFormat = program.format.toLowerCase();
+  const formatSet = new Set<ImageFormat>(['bmp', 'gif', 'jpeg', 'png', 'tiff', 'default']);
+  // For icons, only generate PNG.
+  if (!formatSet.has(programFormat) || programType === 'icon') {
+    programFormat = 'png';
+  }
+  // For images, if on Apple platform, we only generate JPEG or PNG.
+  if (programType === 'image' && programPlatform !== 'web' && programFormat !== 'jpeg' && programFormat !== 'png') {
+    programFormat = 'png';
   }
 
   return {
@@ -36,6 +48,7 @@ function buildOptions(program: any): IconGeneratorOptions {
     platform: programPlatform,
     width: Number(program.width),
     height: Number(program.height),
+    format: programFormat,
   };
 }
 
