@@ -166,6 +166,11 @@ class IconGenerator {
     fs.writeFileSync(path.join(output, 'Contents.json'), JSON.stringify(contents, null, 2));
   }
 
+  /**
+   * Generate web manifest icon images.
+   * @param inputPath    path of input image.
+   * @param outputPath   path of output image.
+   */
   async generateWebIconImages(inputPath: string, outputPath: string) {
     let options: Array<GenericResizeOption> = [
       {
@@ -186,6 +191,12 @@ class IconGenerator {
     return this.generateGenericImages(inputPath, outputPath, options);
   }
 
+  /**
+   * Generate resized images with generic options.
+   * @param inputPath   path of input image.
+   * @param outputPath  path of output image.
+   * @param options     generic options for resizing images.
+   */
   async generateGenericImages(inputPath: string, outputPath: string, options: Array<GenericResizeOption>) {
     const image = await jimp.read(inputPath);
     if (!image) {

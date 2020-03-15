@@ -2,7 +2,7 @@
 import program from 'commander';
 import { IconPlatform, IconType, IconGenerator, IconGeneratorOptions, ImageFormat } from './appiconkit';
 import fs from 'fs';
-import jimp from 'jimp';
+import Jimp from 'jimp';
 const pkg = require('../package.json');
 
 program
@@ -14,8 +14,8 @@ program
   .option('-t, --type <type>', 'type for generated asset', 'icon')
   .option('-p, --platform <value>', 'platform for icon set', 'ios')
   .option('-f, --format <format>', 'format for generated images', 'png')
-  .option('-W, --width <number>', 'width for image set', jimp.AUTO)
-  .option('-H, --height <number>', 'height for image set', jimp.AUTO);
+  .option('-W, --width <number>', 'width for image set', `${Jimp.AUTO}`)
+  .option('-H, --height <number>', 'height for image set', `${Jimp.AUTO}`);
   
 program.parse(process.argv);
 
