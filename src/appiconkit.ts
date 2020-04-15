@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import jimp from 'jimp';
+import Jimp from 'jimp';
 
 type IconPlatform = 'ios' | 'iphone' | 'ipad' | 'watchos' | 'watch' | 'macos' | 'mac' | 'web';
 type IconType = 'icon' | 'image';
@@ -63,8 +63,8 @@ class IconGenerator {
     return this.generateImages(inputPath, outputPath, {
       type: 'icon',
       platform: 'ios',
-      width: width ?? jimp.AUTO,
-      height: height ?? jimp.AUTO,
+      width: width ?? Jimp.AUTO,
+      height: height ?? Jimp.AUTO,
       format: format ?? 'png',
     });
   }
@@ -84,8 +84,8 @@ class IconGenerator {
 
     const type = options.type;
     let platform = options.platform;
-    let programWidth = options.width ?? jimp.AUTO;
-    let programHeight = options.height ?? jimp.AUTO;
+    let programWidth = options.width ?? Jimp.AUTO;
+    let programHeight = options.height ?? Jimp.AUTO;
     let programFormat = options.format ?? 'png';
 
     if (options.platform === 'web') {
@@ -109,7 +109,7 @@ class IconGenerator {
       return Promise.reject(new Error('Config file does not exist.'));
     }
 
-    const image = await jimp.read(inputPath);
+    const image = await Jimp.read(inputPath);
     if (!image) {
       return Promise.reject(new Error('Invalid input image.'));
     }
@@ -143,11 +143,11 @@ class IconGenerator {
         height = Number(sizes[1]) * scale;
         fileNameSuffix = `-${width}`;
       } else {
-        if (programHeight === jimp.AUTO && programWidth === jimp.AUTO) {
+        if (programHeight === Jimp.AUTO && programWidth === Jimp.AUTO) {
           programWidth = image.bitmap.width / 3;
         }
-        width = (programWidth === jimp.AUTO) ? jimp.AUTO : programWidth * scale;
-        height = (programHeight === jimp.AUTO) ? jimp.AUTO : programHeight * scale;
+        width = (programWidth === Jimp.AUTO) ? Jimp.AUTO : programWidth * scale;
+        height = (programHeight === Jimp.AUTO) ? Jimp.AUTO : programHeight * scale;
         fileNameSuffix = `@${scale}x`;
       }
 
@@ -198,7 +198,7 @@ class IconGenerator {
    * @param options     generic options for resizing images.
    */
   async generateGenericImages(inputPath: string, outputPath: string, options: Array<GenericResizeOption>) {
-    const image = await jimp.read(inputPath);
+    const image = await Jimp.read(inputPath);
     if (!image) {
       return Promise.reject(new Error('Invalid input image.'));
     }

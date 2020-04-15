@@ -35,9 +35,9 @@
   ],
   "homepage": "https://github.com/xnth97/appiconkit#readme",
   "dependencies": {
-    "@types/node": "^13.9.1",
+    "@types/node": "^13.11.1",
     "commander": "^5.0.0",
-    "jimp": "^0.9.5"
+    "jimp": "^0.9.8"
   },
   "devDependencies": {
     "typescript": "^3.8.3"

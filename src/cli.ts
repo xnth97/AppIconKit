@@ -54,13 +54,13 @@ function buildOptions(program: any): IconGeneratorOptions {
 
 if (program.args.length < 1) {
   console.error('Error: must provide an input image');
-  process.exit(0);
+  process.exit(1);
 }
 
 const input = program.args[0];
 if (!fs.existsSync(input)) {
   console.error('Error: input image must be valid!');
-  process.exit(0);
+  process.exit(1);
 }
 
 let output: string = program.output;
@@ -69,7 +69,7 @@ if (!fs.existsSync(output)) {
     fs.mkdirSync(output);
   } catch (err) {
     console.error(err.message);
-    process.exit(0);
+    process.exit(1);
   }
 }
 
