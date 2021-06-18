@@ -3,7 +3,7 @@ import path from 'path';
 import Jimp from 'jimp';
 
 type IconPlatform = 'ios' | 'iphone' | 'ipad' | 'watchos' | 'watch' | 'macos' | 'mac' | 'web';
-type IconType = 'icon' | 'image';
+type IconType = 'icon' | 'image' | 'iconset' | 'imageset';
 type ImageFormat = 'bmp' | 'gif' | 'jpeg' | 'png' | 'tiff' | 'default';
 
 interface IconGeneratorOptions {
@@ -118,7 +118,7 @@ class IconGenerator {
     }
 
     let output: string;
-    if (type === 'icon') {
+    if (type === 'icon' || type === 'iconset') {
       output = path.join(outputPath, 'AppIcon.appiconset');
     } else {
       const fileName = path.basename(inputPath).split('.')[0];
@@ -137,7 +137,7 @@ class IconGenerator {
       let height: number;
       const scale = Number(imageConfig.scale.slice(0, -1));
       let fileNameSuffix: string;
-      if (type === 'icon') {
+      if (type === 'icon' || type === 'iconset') {
         const sizes = imageConfig.size.split('x');
         width = Number(sizes[0]) * scale; 
         height = Number(sizes[1]) * scale;

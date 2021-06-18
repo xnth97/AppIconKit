@@ -21,7 +21,7 @@ program.parse(process.argv);
 
 function buildOptions(program: any): IconGeneratorOptions {
   let programType: IconType = program.type.toLowerCase();
-  const typeSet = new Set<IconType>(['icon', 'image']);
+  const typeSet = new Set<IconType>(['icon', 'image', 'iconset', 'imageset']);
   if (!typeSet.has(programType)) {
     programType = 'icon';
   }
