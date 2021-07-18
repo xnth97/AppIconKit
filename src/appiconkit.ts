@@ -88,8 +88,11 @@ class IconGenerator {
     let programHeight = options.height ?? Jimp.AUTO;
     let programFormat = options.format ?? 'png';
 
+    const fileName = path.basename(inputPath).split('.')[0];
+
     if (options.platform === 'web') {
-      return this.generateWebIconImages(inputPath, outputPath);
+      let webOutputPath = path.join(outputPath, fileName);
+      return this.generateWebIconImages(inputPath, webOutputPath);
     }
 
     const platformMap = {
@@ -121,7 +124,6 @@ class IconGenerator {
     if (type === 'icon' || type === 'iconset') {
       output = path.join(outputPath, 'AppIcon.appiconset');
     } else {
-      const fileName = path.basename(inputPath).split('.')[0];
       output = path.join(outputPath, `${fileName}.imageset`);
     }
 
@@ -171,23 +173,41 @@ class IconGenerator {
    * @param inputPath    path of input image.
    * @param outputPath   path of output image.
    */
-  async generateWebIconImages(inputPath: string, outputPath: string) {
-    let options: Array<GenericResizeOption> = [
-      {
-        width: 16,
-        height: 16,
-        filename: 'favicon',
+  async generateWebIconImages(inputPath: string, outputPath: string): Promise<void> {
+    const config: { [key: string]: Array<number> } = require('../config/web/config.json');
+    if (!config) {
+      return Promise.reject(new Error('Config file does not exist.'));
+    }
+
+    let htmlCode = '';
+
+    let options = new Array<GenericResizeOption>();
+    for (let appleIconDimension of config.appleIconDimensions) {
+      options.push({
+        width: appleIconDimension,
+        height: appleIconDimension,
+        filename: `apple-touch-icon-${appleIconDimension}x${appleIconDimension}`,
         format: 'png',
-      }, {
-        width: 192,
-        height: 192,
+      });
+      htmlCode = htmlCode.concat(`<link rel="apple-touch-icon-precomposed" sizes="${appleIconDimension}x${appleIconDimension}" href="apple-touch-icon-${appleIconDimension}x${appleIconDimension}.png" />\n`);
+    }
+    for (let favIconDimension of config.favIconDimensions) {
+      options.push({
+        width: favIconDimension,
+        height: favIconDimension,
+        filename: `favicon-${favIconDimension}x${favIconDimension}`,
         format: 'png',
-      }, {
-        width: 512,
-        height: 512,
-        format: 'png',
-      }
-    ];
+      });
+      htmlCode = htmlCode.concat(`<link rel="icon" type="image/png" href="favicon-${favIconDimension}x${favIconDimension}.png" sizes="${favIconDimension}x${favIconDimension}" />\n`);
+    }
+
+    if (!this.createDirectoryIfNeeded(outputPath)) {
+      return Promise.reject(new Error(`Error: cannot create directory at output path ${outputPath}.`));
+    } 
+
+    let codePath = path.join(outputPath, 'code.txt');
+    fs.writeFileSync(codePath, htmlCode);
+    console.log(`Generated HTML code for favicons is saved to ${codePath}`);
     return this.generateGenericImages(inputPath, outputPath, options);
   }
 
@@ -197,22 +217,14 @@ class IconGenerator {
    * @param outputPath  path of output image.
    * @param options     generic options for resizing images.
    */
-  async generateGenericImages(inputPath: string, outputPath: string, options: Array<GenericResizeOption>) {
+  async generateGenericImages(inputPath: string, outputPath: string, options: Array<GenericResizeOption>): Promise<void> {
     const image = await Jimp.read(inputPath);
     if (!image) {
       return Promise.reject(new Error('Invalid input image.'));
     }
-    
-    if (!fs.existsSync(outputPath)) {
-      try {
-        fs.mkdirSync(outputPath);
-      } catch(error) {
-        return Promise.reject(error);
-      }
-    }
-    
-    if (!fs.lstatSync(outputPath).isDirectory()) {
-      return Promise.reject(new Error(`Error: ${outputPath} exists and is not a directory.`));
+
+    if (!this.createDirectoryIfNeeded(outputPath)) {
+      return Promise.reject(new Error(`Error: cannot create directory at output path ${outputPath}.`));
     }
 
     const extName = path.extname(inputPath);
@@ -232,6 +244,22 @@ class IconGenerator {
       const newPath = path.join(outputPath, newFileName);
       await image.clone().resize(option.width, option.height).writeAsync(newPath);
     }
+  }
+
+  private createDirectoryIfNeeded(path: string): boolean {
+    if (!fs.existsSync(path)) {
+      try {
+        fs.mkdirSync(path);
+      } catch(error) {
+        return false;
+      }
+    }
+    
+    if (!fs.lstatSync(path).isDirectory()) {
+      return false;
+    }
+
+    return true;
   }
 
 }

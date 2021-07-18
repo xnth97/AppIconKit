@@ -1,7 +1,7 @@
 {
   "name": "appiconkit",
-  "version": "1.1.2",
-  "description": "An app icon/image assets generator for Apple platforms.",
+  "version": "2.0",
+  "description": "An app icon/image assets generator for Apple platforms and favicon for web.",
   "main": "lib/appiconkit.js",
   "types": "lib/appiconkit.d.ts",
   "bin": {
@@ -31,15 +31,16 @@
     "imageset",
     "web",
     "app",
-    "app development"
+    "app development",
+    "favicon"
   ],
   "homepage": "https://github.com/xnth97/appiconkit#readme",
   "dependencies": {
-    "@types/node": "^13.11.1",
-    "commander": "^5.0.0",
-    "jimp": "^0.9.8"
+    "@types/node": "^16.3.3",
+    "commander": "^8.0.0",
+    "jimp": "^0.16.1"
   },
   "devDependencies": {
-    "typescript": "^3.8.3"
+    "typescript": "^4.3.5"
   }
 }

@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-import program from 'commander';
+import { Command } from 'commander';
 import { IconPlatform, IconType, IconGenerator, IconGeneratorOptions, ImageFormat } from './appiconkit';
 import fs from 'fs';
 import Jimp from 'jimp';
 const pkg = require('../package.json');
 
+const program = new Command();
 program
   .version(pkg.version, '-v, --version', 'output the version number')
   .description(pkg.description)
@@ -19,20 +20,22 @@ program
   
 program.parse(process.argv);
 
-function buildOptions(program: any): IconGeneratorOptions {
-  let programType: IconType = program.type.toLowerCase();
+function buildOptions(program: Command): IconGeneratorOptions {
+  const options = program.opts();
+
+  let programType: IconType = options.type.toLowerCase();
   const typeSet = new Set<IconType>(['icon', 'image', 'iconset', 'imageset']);
   if (!typeSet.has(programType)) {
     programType = 'icon';
   }
 
-  let programPlatform: IconPlatform = program.platform.toLowerCase();
+  let programPlatform: IconPlatform = options.platform.toLowerCase();
   const platformSet = new Set<IconPlatform>(['ios', 'iphone', 'ipad', 'watchos', 'watch', 'macos', 'mac', 'web']);
   if (!platformSet.has(programPlatform)) {
     programPlatform = 'ios';
   }
 
-  let programFormat: ImageFormat = program.format.toLowerCase();
+  let programFormat: ImageFormat = options.format.toLowerCase();
   const formatSet = new Set<ImageFormat>(['bmp', 'gif', 'jpeg', 'png', 'tiff', 'default']);
   // For icons, only generate PNG.
   if (!formatSet.has(programFormat) || programType === 'icon') {
@@ -46,8 +49,8 @@ function buildOptions(program: any): IconGeneratorOptions {
   return {
     type: programType,
     platform: programPlatform,
-    width: Number(program.width),
-    height: Number(program.height),
+    width: Number(options.width),
+    height: Number(options.height),
     format: programFormat,
   };
 }
@@ -63,7 +66,9 @@ if (!fs.existsSync(input)) {
   process.exit(1);
 }
 
-let output: string = program.output;
+const options = program.opts();
+
+let output: string = options.output;
 if (!fs.existsSync(output)) {
   try {
     fs.mkdirSync(output);
