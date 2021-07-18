@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { IconPlatform, IconType, IconGenerator, IconGeneratorOptions, ImageFormat } from './appiconkit';
+import { IconPlatform, IconType, IconGenerator, IconGeneratorOption, ImageFormat } from './appiconkit';
 import fs from 'fs';
 import Jimp from 'jimp';
 const pkg = require('../package.json');
@@ -20,7 +20,7 @@ program
   
 program.parse(process.argv);
 
-function buildOptions(program: Command): IconGeneratorOptions {
+function buildOptions(program: Command): IconGeneratorOption {
   const options = program.opts();
 
   let programType: IconType = options.type.toLowerCase();

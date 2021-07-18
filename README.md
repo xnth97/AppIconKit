@@ -28,7 +28,7 @@ icon <input> [options]
 
 `-p, --platform <platform>`: Platform for icon set. Can be `ios | watchos | macos | web`.
 
-Please note that for `web` platform, only manifest icon images will be generated, following definitions [here](https://web.dev/add-manifest/).
+Please note that for `web` platform, favicons will be generated, along with `code.txt` that includes HTML code.
 
 `-f, --format <format>`: Format for generated images. Can be `'bmp' | 'gif' | 'jpeg' | 'png' | 'tiff' | 'default'`. Default value is `png`.
 
@@ -78,6 +78,22 @@ g.generateImages('/path/to/image', '/path/to/output', {
   height: 120,
   format: 'png',
 });
+```
+
+You can also call `generateGenericImages` and pass an array of `GenericResizeOption` to export a set of images that fit your need.
+
+```javascript
+g.generateGenericImages('/path/to/image', '/path/to/output', [{
+  width: 16,
+  height: 16,
+  filename: '16icon',
+  format: 'png',
+}, {
+  width: 32,
+  height: 32,
+  filename: 'anotherIcon',
+  format: 'tiff',
+}]);
 ```
 
 ## License

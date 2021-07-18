@@ -6,7 +6,7 @@ type IconPlatform = 'ios' | 'iphone' | 'ipad' | 'watchos' | 'watch' | 'macos' | 
 type IconType = 'icon' | 'image' | 'iconset' | 'imageset';
 type ImageFormat = 'bmp' | 'gif' | 'jpeg' | 'png' | 'tiff' | 'default';
 
-interface IconGeneratorOptions {
+interface IconGeneratorOption {
   type: IconType;
   platform: IconPlatform;
   width?: number;
@@ -30,7 +30,7 @@ class IconGenerator {
    * Constructs an IconGenerator object.
    */
   constructor() {
-
+    // no op
   }
 
   /**
@@ -70,13 +70,13 @@ class IconGenerator {
   }
 
   /**
-   * Generates .appiconset or .imageset with a given image.
+   * Generates .appiconset or .imageset or favicon with a given image.
    * @param inputPath         path of input image
    * @param outputPath        path of output images
-   * @param generatorOptions  options for image generator
+   * @param generatorOption  options for image generator
    */
-  async generateImages(inputPath: string, outputPath: string, generatorOptions?: IconGeneratorOptions): Promise<void> {
-    let options = generatorOptions ?? {
+  async generateImages(inputPath: string, outputPath: string, generatorOption?: IconGeneratorOption): Promise<void> {
+    let options = generatorOption ?? {
       type: 'icon',
       platform: 'ios',
       format: 'png',
@@ -109,15 +109,15 @@ class IconGenerator {
     const config: { [key: string]: any } = require(`../config/${pathDir}/Contents.json`);
 
     if (!config) {
-      return Promise.reject(new Error('Config file does not exist.'));
+      return Promise.reject(new Error('Error: Config file does not exist.'));
     }
 
     const image = await Jimp.read(inputPath);
     if (!image) {
-      return Promise.reject(new Error('Invalid input image.'));
+      return Promise.reject(new Error('Error: Invalid input image.'));
     }
     if (type === 'icon' && (image.getWidth() < 1024 || image.getHeight() < 1024)) {
-      return Promise.reject(new Error('Icon size must be greater than 1024x1024.'));
+      return Promise.reject(new Error('Error: Icon size must be greater than 1024x1024.'));
     }
 
     let output: string;
@@ -176,7 +176,7 @@ class IconGenerator {
   async generateWebIconImages(inputPath: string, outputPath: string): Promise<void> {
     const config: { [key: string]: Array<number> } = require('../config/web/config.json');
     if (!config) {
-      return Promise.reject(new Error('Config file does not exist.'));
+      return Promise.reject(new Error('Error: Config file does not exist.'));
     }
 
     let htmlCode = '';
@@ -220,21 +220,21 @@ class IconGenerator {
   async generateGenericImages(inputPath: string, outputPath: string, options: Array<GenericResizeOption>): Promise<void> {
     const image = await Jimp.read(inputPath);
     if (!image) {
-      return Promise.reject(new Error('Invalid input image.'));
+      return Promise.reject(new Error('Error: Invalid input image.'));
     }
 
     if (!this.createDirectoryIfNeeded(outputPath)) {
-      return Promise.reject(new Error(`Error: cannot create directory at output path ${outputPath}.`));
+      return Promise.reject(new Error(`Error: Cannot create directory at output path ${outputPath}.`));
     }
 
     const extName = path.extname(inputPath);
     for (let option of options) {
-      let newFileName;
-      let newExtName;
+      let newFileName: string;
+      let newExtName: string;
       if (option.format === 'default') {
         newExtName = extName;
       } else {
-        newExtName = `.${option.format}`;
+        newExtName = `.${option.format ?? 'png'}`;
       }
       if (option.filename !== undefined) {
         newFileName = `${option.filename}${newExtName}`;
@@ -268,7 +268,7 @@ export {
   IconPlatform,
   IconType,
   IconGenerator,
-  IconGeneratorOptions,
+  IconGeneratorOption,
   GenericResizeOption,
   ImageFormat,
 }
