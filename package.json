@@ -1,6 +1,6 @@
 {
   "name": "appiconkit",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "An app icon/image assets generator for Apple platforms and favicon for web.",
   "main": "lib/appiconkit.js",
   "types": "lib/appiconkit.d.ts",

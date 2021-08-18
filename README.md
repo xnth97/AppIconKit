@@ -17,12 +17,10 @@ npm install -g appiconkit
 The default command is `icon`.
 
 ```
-icon <input> [options]
+icon [options] <input> [output]
 ```
 
 ### Options
-
-`-o, --output <path>`: Output path for generated icon set or image set. Default value is current path.
 
 `-t, --type <type>`: Type for generated assets. Can be `icon | image`.
 
@@ -68,10 +66,10 @@ Call proper functions to generate imageset or appiconset.
 g.generateIconSet('/path/to/image', '/path/to/output');
 ```
 
-Or you can call `generateImages` and pass your own options.
+Or you can call `generateImageAssets` and pass your own options.
 
 ```javascript
-g.generateImages('/path/to/image', '/path/to/output', {
+g.generateImageAssets('/path/to/image', '/path/to/output', {
   type: 'image',
   platform: 'ios',
   width: 160,
@@ -80,10 +78,10 @@ g.generateImages('/path/to/image', '/path/to/output', {
 });
 ```
 
-You can also call `generateGenericImages` and pass an array of `GenericResizeOption` to export a set of images that fit your need.
+You can also call `generateImages` and pass an array of `ResizeOption` to export a set of images that fit your need.
 
 ```javascript
-g.generateGenericImages('/path/to/image', '/path/to/output', [{
+g.generateImages('/path/to/image', '/path/to/output', [{
   width: 16,
   height: 16,
   filename: '16icon',

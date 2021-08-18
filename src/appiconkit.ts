@@ -2,19 +2,18 @@ import fs from 'fs';
 import path from 'path';
 import Jimp from 'jimp';
 
-type IconPlatform = 'ios' | 'iphone' | 'ipad' | 'watchos' | 'watch' | 'macos' | 'mac' | 'web';
-type IconType = 'icon' | 'image' | 'iconset' | 'imageset';
 type ImageFormat = 'bmp' | 'gif' | 'jpeg' | 'png' | 'tiff' | 'default';
-
-interface IconGeneratorOption {
-  type: IconType;
+type IconPlatform = 'ios' | 'iphone' | 'ipad' | 'watchos' | 'watch' | 'macos' | 'mac' | 'web';
+type GeneratorType = 'icon' | 'image' | 'iconset' | 'imageset';
+interface GeneratorOption {
+  type: GeneratorType;
   platform: IconPlatform;
   width?: number;
   height?: number;
   format?: ImageFormat;
 }
 
-interface GenericResizeOption {
+interface ResizeOption {
   width: number;
   height: number;
   filename?: string;
@@ -40,10 +39,9 @@ class IconGenerator {
    * @param platform      platform of app icon (ios | watchos | macos)
    */
   async generateIconSet(inputPath: string, outputPath: string, platform?: IconPlatform): Promise<void> {
-    return this.generateImages(inputPath, outputPath, {
+    return this.generateImageAssets(inputPath, outputPath, {
       type: 'icon',
       platform: platform ?? 'ios',
-      format: 'png',
     });
   }
 
@@ -59,13 +57,12 @@ class IconGenerator {
    * @param width         @1x width of the output image
    * @param height        @1x height of the output image
    */
-  async generateImageSet(inputPath: string, outputPath: string, width?: number, height?: number, format?: ImageFormat): Promise<void> {
-    return this.generateImages(inputPath, outputPath, {
+  async generateImageSet(inputPath: string, outputPath: string, width?: number, height?: number): Promise<void> {
+    return this.generateImageAssets(inputPath, outputPath, {
       type: 'icon',
       platform: 'ios',
       width: width ?? Jimp.AUTO,
       height: height ?? Jimp.AUTO,
-      format: format ?? 'png',
     });
   }
 
@@ -75,11 +72,10 @@ class IconGenerator {
    * @param outputPath        path of output images
    * @param generatorOption  options for image generator
    */
-  async generateImages(inputPath: string, outputPath: string, generatorOption?: IconGeneratorOption): Promise<void> {
-    let options = generatorOption ?? {
+  async generateImageAssets(inputPath: string, outputPath: string, generatorOption?: GeneratorOption): Promise<void> {
+    let options: GeneratorOption = generatorOption ?? {
       type: 'icon',
       platform: 'ios',
-      format: 'png',
     };
 
     const type = options.type;
@@ -117,7 +113,7 @@ class IconGenerator {
       return Promise.reject(new Error('Error: Invalid input image.'));
     }
     if (type === 'icon' && (image.getWidth() < 1024 || image.getHeight() < 1024)) {
-      return Promise.reject(new Error('Error: Icon size must be greater than 1024x1024.'));
+      console.warn('Warning: Icon size must be greater than 1024x1024.');
     }
 
     let output: string;
@@ -127,13 +123,13 @@ class IconGenerator {
       output = path.join(outputPath, `${fileName}.imageset`);
     }
 
-    try {
-      fs.mkdirSync(output);
-    } catch(error) {
-      return Promise.reject(error);
+    if (!this.createDirectoryIfNeeded(output)) {
+      return Promise.reject(new Error(`Error: cannot create path ${output}.`));
     }
 
     let contents = config;
+    let resizeOptions = new Array<ResizeOption>();
+
     for (let imageConfig of contents.images) {
       let width: number;
       let height: number;
@@ -158,14 +154,21 @@ class IconGenerator {
       if (programFormat !== 'default') {
         extName = `.${programFormat}`;
       }
-      const newFileName = `${baseName}${fileNameSuffix}${extName}`;
-      const newPath = path.join(output, newFileName);
-      await image.clone().resize(width, height).writeAsync(newPath);
+      const newFileName = `${baseName}${fileNameSuffix}`;
 
-      imageConfig['filename'] = newFileName;
+      let resizeOption: ResizeOption = {
+        width: width,
+        height: height,
+        filename: newFileName,
+        format: programFormat,
+      };
+
+      imageConfig['filename'] = `${newFileName}${extName}`;
+      resizeOptions.push(resizeOption);
     }
 
     fs.writeFileSync(path.join(output, 'Contents.json'), JSON.stringify(contents, null, 2));
+    return this.generateImages(inputPath, output, resizeOptions);
   }
 
   /**
@@ -181,7 +184,7 @@ class IconGenerator {
 
     let htmlCode = '';
 
-    let options = new Array<GenericResizeOption>();
+    let options = new Array<ResizeOption>();
     for (let appleIconDimension of config.appleIconDimensions) {
       options.push({
         width: appleIconDimension,
@@ -208,7 +211,7 @@ class IconGenerator {
     let codePath = path.join(outputPath, 'code.txt');
     fs.writeFileSync(codePath, htmlCode);
     console.log(`Generated HTML code for favicons is saved to ${codePath}`);
-    return this.generateGenericImages(inputPath, outputPath, options);
+    return this.generateImages(inputPath, outputPath, options);
   }
 
   /**
@@ -217,7 +220,7 @@ class IconGenerator {
    * @param outputPath  path of output image.
    * @param options     generic options for resizing images.
    */
-  async generateGenericImages(inputPath: string, outputPath: string, options: Array<GenericResizeOption>): Promise<void> {
+  async generateImages(inputPath: string, outputPath: string, options: Array<ResizeOption>): Promise<void> {
     const image = await Jimp.read(inputPath);
     if (!image) {
       return Promise.reject(new Error('Error: Invalid input image.'));
@@ -265,10 +268,10 @@ class IconGenerator {
 }
 
 export {
-  IconPlatform,
-  IconType,
+  GeneratorOption,
+  GeneratorType,
   IconGenerator,
-  IconGeneratorOption,
-  GenericResizeOption,
+  IconPlatform,
   ImageFormat,
+  ResizeOption,
 }

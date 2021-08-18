@@ -1,30 +1,37 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { IconPlatform, IconType, IconGenerator, IconGeneratorOption, ImageFormat } from './appiconkit';
+import {   
+  GeneratorOption,
+  GeneratorType,
+  IconGenerator,
+  IconPlatform,
+  ImageFormat,
+} from './appiconkit';
 import fs from 'fs';
 import Jimp from 'jimp';
 const pkg = require('../package.json');
 
 const program = new Command();
+
 program
   .version(pkg.version, '-v, --version', 'output the version number')
   .description(pkg.description)
-  .arguments('<input>')
   .usage('')
-  .option('-o, --output <path>', 'output path for icon set', process.cwd())
+  .argument('<input>', 'input path of image')
+  .argument('[output]', 'output path of generated assets')
   .option('-t, --type <type>', 'type for generated asset', 'icon')
-  .option('-p, --platform <value>', 'platform for icon set', 'ios')
+  .option('-p, --platform <platform>', 'platform for icon set', 'ios')
   .option('-f, --format <format>', 'format for generated images', 'png')
   .option('-W, --width <number>', 'width for image set', `${Jimp.AUTO}`)
   .option('-H, --height <number>', 'height for image set', `${Jimp.AUTO}`);
   
 program.parse(process.argv);
 
-function buildOptions(program: Command): IconGeneratorOption {
+function buildOptions(program: Command): GeneratorOption {
   const options = program.opts();
 
-  let programType: IconType = options.type.toLowerCase();
-  const typeSet = new Set<IconType>(['icon', 'image', 'iconset', 'imageset']);
+  let programType: GeneratorType = options.type.toLowerCase();
+  const typeSet = new Set<GeneratorType>(['icon', 'image', 'iconset', 'imageset']);
   if (!typeSet.has(programType)) {
     programType = 'icon';
   }
@@ -56,19 +63,17 @@ function buildOptions(program: Command): IconGeneratorOption {
 }
 
 if (program.args.length < 1) {
-  console.error('Error: must provide an input image');
+  console.error('Error: must provide an input image.');
   process.exit(1);
 }
 
 const input = program.args[0];
 if (!fs.existsSync(input)) {
-  console.error('Error: input image must be valid!');
+  console.error('Error: input image must be valid.');
   process.exit(1);
 }
 
-const options = program.opts();
-
-let output: string = options.output;
+const output = program.args[1] ?? process.cwd();
 if (!fs.existsSync(output)) {
   try {
     fs.mkdirSync(output);
@@ -80,7 +85,7 @@ if (!fs.existsSync(output)) {
 
 let generator = new IconGenerator();
 generator
-  .generateImages(input, output, buildOptions(program))
+  .generateImageAssets(input, output, buildOptions(program))
   .catch(e => {
     console.error((e as Error).message);
   });
